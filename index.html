@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Asisten Operasional</title>
+<style>
+  :root{
+    --bg:#ffffff; --soft:#f6f8fb; --line:#e5e9f0; --text:#1d2433; --muted:#5b6475;
+    --primary:#0f766e; --primary-soft:#e6f4f2; --danger:#c2410c; --danger-soft:#fff3ec;
+    --green:#16a34a; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  section{padding:64px 0}
+  h2{font-size:1.75rem;text-align:center;margin-bottom:8px}
+  .sub{text-align:center;color:var(--muted);margin-bottom:36px}
+
+  /* HERO */
+  .hero{background:linear-gradient(180deg,var(--primary-soft),#fff);text-align:center;padding:80px 0 64px}
+  .avatar{width:96px;height:96px;border-radius:50%;background:#fff;border:3px solid var(--primary);
+    display:flex;align-items:center;justify-content:center;font-size:46px;margin:0 auto 20px;
+    box-shadow:0 10px 30px rgba(15,118,110,.18)}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    padding:6px 14px;border-radius:999px;font-size:.9rem;font-weight:600;margin-bottom:18px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}70%{box-shadow:0 0 0 10px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+  .hero h1{font-size:2.4rem;margin-bottom:12px}
+  .hero p{font-size:1.15rem;color:var(--muted);max-width:640px;margin:0 auto 28px}
+  .btn{display:inline-block;background:var(--primary);color:#fff;text-decoration:none;font-weight:700;
+    padding:14px 28px;border-radius:12px;transition:.2s;border:none;cursor:pointer;font-size:1rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(15,118,110,.3)}
+
+  /* PROBLEM & SOLUTION */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .col{border-radius:var(--radius);padding:28px;border:1px solid var(--line)}
+  .col.chaos{background:var(--danger-soft);border-color:#fcd9c4}
+  .col.solve{background:var(--primary-soft);border-color:#bfe3de}
+  .col h3{font-size:1.25rem;margin-bottom:16px}
+  .chaos h3{color:var(--danger)} .solve h3{color:var(--primary)}
+  .col ul{list-style:none;display:grid;gap:12px}
+  .col li{background:#fff;padding:12px 14px;border-radius:10px;font-size:.97rem}
+
+  /* CAPABILITIES */
+  .bg-soft{background:var(--soft)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(29,36,51,.08)}
+  .icon{width:52px;height:52px;border-radius:12px;background:var(--primary-soft);display:flex;
+    align-items:center;justify-content:center;font-size:26px;margin-bottom:14px}
+  .card h3{font-size:1.1rem;margin-bottom:6px}
+  .card p{color:var(--muted);font-size:.95rem}
+
+  /* SIMULATION */
+  .sim{max-width:560px;margin:0 auto;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    box-shadow:0 12px 32px rgba(29,36,51,.08)}
+  .sim-head{background:var(--primary);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px}
+  .sim-head .mini{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .sim-head small{display:block;opacity:.85;font-size:.8rem}
+  .chat{background:#efeae2;height:340px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:.94rem;animation:pop .3s ease;white-space:pre-line}
+  .msg.user{align-self:flex-end;background:#d9fdd3;border-bottom-right-radius:4px}
+  .msg.bot{align-self:flex-start;background:#fff;border-bottom-left-radius:4px}
+  .hint{align-self:center;color:var(--muted);font-size:.88rem;text-align:center;margin-top:120px}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .typing{display:flex;gap:4px;padding:14px}
+  .typing span{width:8px;height:8px;border-radius:50%;background:#9aa3b2;animation:blink 1s infinite}
+  .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+  .scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px;background:#fff;border-top:1px solid var(--line)}
+  .scenarios button{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 8px;
+    font-size:.88rem;font-weight:600;color:var(--text);cursor:pointer;transition:.2s}
+  .scenarios button:hover:not(:disabled){background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+  .scenarios button:disabled{opacity:.5;cursor:not-allowed}
+
+  /* FOOTER */
+  footer{background:var(--text);color:#fff;text-align:center;padding:64px 20px 32px}
+  footer h2{color:#fff}
+  footer .sub{color:#c4cad6}
+  .btn-wa{background:#25d366;font-size:1.1rem;padding:16px 34px}
+  .btn-wa:hover{box-shadow:0 8px 22px rgba(37,211,102,.4)}
+  .credit{margin-top:40px;font-size:.85rem;color:#9aa3b2}
+
+  @media(max-width:760px){
+    .compare,.cards{grid-template-columns:1fr}
+    .hero h1{font-size:1.8rem}
+    .scenarios{grid-template-columns:1fr}
+    section{padding:48px 0}
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="avatar">🤖</div>
+    <div class="badge"><span class="dot"></span>🟢 Status: Active &amp; Ready 24/7</div>
+    <h1>AI Asisten Operasional</h1>
+    <p>Karyawan digital yang membalas chat customer 24/7 dan menjaga SOP salonmu tetap rapi, tanpa ribet.</p>
+    <a href="#simulasi" class="btn">Lihat Cara Kerjanya ↓</a>
+  </div>
+</header>
+
+<!-- 2. PROBLEM & SOLUTION -->
+<section>
+  <div class="wrap">
+    <h2>Dari Ribet Jadi Rapi</h2>
+    <p class="sub">Masalah harian owner salon & klinik, diselesaikan satu asisten.</p>
+    <div class="compare">
+      <div class="col chaos">
+        <h3>😵 The Chaos</h3>
+        <ul>
+          <li>💬 Chat customer di WhatsApp telat dibalas, calon pelanggan keburu pindah ke tempat lain.</li>
+          <li>📄 SOP tidak tertulis, tim bingung dan kualitas layanan beda-beda tiap orang.</li>
+          <li>📅 Jadwal booking dicatat manual, sering bentrok dan terlewat.</li>
+        </ul>
+      </div>
+      <div class="col solve">
+        <h3>✨ The Solution</h3>
+        <ul>
+          <li>⚡ AI membalas chat customer secara instan 24/7, lengkap dengan info harga & layanan.</li>
+          <li>📚 SOP tersimpan rapi di Google Drive dan bisa ditanyakan tim kapan saja.</li>
+          <li>✅ Booking langsung tercatat di Google Calendar, tanpa bentrok.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CORE CAPABILITIES -->
+<section class="bg-soft">
+  <div class="wrap">
+    <h2>Kemampuan Utama</h2>
+    <p class="sub">Terhubung dengan tools yang sudah kamu pakai setiap hari.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">💬</div>
+        <h3>AI Asisten Chat (WhatsApp)</h3>
+        <p>Menjawab pertanyaan harga, layanan, dan promo secara instan dengan gaya bahasa salonmu.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📅</div>
+        <h3>Google Calendar</h3>
+        <p>Mengecek jadwal kosong dan mencatat booking customer secara otomatis.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📁</div>
+        <h3>Google Drive</h3>
+        <p>Menyimpan SOP tertulis dan menarik jawabannya saat tim butuh panduan kerja.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. INTERACTIVE SIMULATION -->
+<section id="simulasi">
+  <div class="wrap">
+    <h2>Coba Simulasinya</h2>
+    <p class="sub">Klik salah satu skenario dan lihat asisten bekerja.</p>
+    <div class="sim">
+      <div class="sim-head">
+        <div class="mini">🤖</div>
+        <div><strong>AI Asisten Operasional</strong><small>online</small></div>
+      </div>
+      <div class="chat" id="chat">
+        <div class="hint">👇 Pilih skenario di bawah untuk memulai percakapan</div>
+      </div>
+      <div class="scenarios">
+        <button data-s="0">💰 Tanya Harga</button>
+        <button data-s="1">📅 Booking Jadwal</button>
+        <button data-s="2">📄 Staf Tanya SOP</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. FOOTER & CTA -->
+<footer>
+  <div class="wrap">
+    <h2>Siap Punya Karyawan Digital Sendiri?</h2>
+    <p class="sub">Ngobrol langsung untuk lihat bagaimana AI Asisten Operasional bisa bekerja di bisnismu.</p>
+    <a class="btn btn-wa" target="_blank" rel="noopener"
+       href="https://wa.me/6281288676080?text=Halo%2C%20saya%20tertarik%20dengan%20AI%20Asisten%20Operasional">
+       💬 Hubungi via WhatsApp
+    </a>
+    <p class="credit">Built with AI · AI Builder Bootcamp Showcase</p>
+  </div>
+</footer>
+
+<script>
+  const scenarios = [
+    [
+      {u:"Halo kak, facial acne berapa ya harganya?"},
+      {b:"Halo kak! 😊 Facial Acne harganya Rp150.000 (durasi ±60 menit).\nMinggu ini ada promo diskon 20% untuk customer baru. Mau sekalian dibookingkan?"}
+    ],
+    [
+      {u:"Kak, mau booking creambath besok jam 2 siang bisa?"},
+      {b:"Sebentar ya kak, saya cek jadwal dulu... 📅"},
+      {b:"Jadwal besok jam 14.00 masih kosong ✅\nBooking Creambath atas nama kakak sudah tercatat. Sampai jumpa besok! 💆‍♀️"}
+    ],
+    [
+      {u:"Gimana SOP sterilisasi alat setelah dipakai?"},
+      {b:"Ini SOP Sterilisasi Alat dari Google Drive 📁:\n1. Cuci alat dengan sabun & air mengalir\n2. Rendam di cairan disinfektan 10 menit\n3. Keringkan, lalu masukkan ke sterilizer UV\n4. Simpan di wadah tertutup berlabel"}
+    ]
+  ];
+
+  const chat = document.getElementById("chat");
+  const buttons = document.querySelectorAll(".scenarios button");
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  function addMsg(text, who){
+    const el = document.createElement("div");
+    el.className = "msg " + who;
+    el.textContent = text;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function play(i){
+    buttons.forEach(b => b.disabled = true);
+    chat.innerHTML = "";
+    for (const step of scenarios[i]){
+      if (step.u){ addMsg(step.u, "user"); await wait(700); }
+      if (step.b){
+        const t = document.createElement("div");
+        t.className = "msg bot typing";
+        t.innerHTML = "<span></span><span></span><span></span>";
+        chat.appendChild(t); chat.scrollTop = chat.scrollHeight;
+        await wait(1400);
+        t.remove();
+        addMsg(step.b, "bot");
+        await wait(500);
+      }
+    }
+    buttons.forEach(b => b.disabled = false);
+  }
+
+  buttons.forEach(b => b.addEventListener("click", () => play(+b.dataset.s)));
+</script>
+</body>
+</html>
